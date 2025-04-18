@@ -1,3 +1,20 @@
+export interface Employee {
+  id: string
+  name: string
+  phone?: string
+  email?: string
+  region?: string
+  position?: string
+  password?: string
+  groupId?: string
+  groupName?: string
+}
+
+export interface Group {
+  id: string
+  name: string
+}
+
 export interface Visit {
   id: string
   hospitalName: string
@@ -13,6 +30,6 @@ export interface Visit {
   latitude: number
   longitude: number
   createdAt: Date
-  employeeId: string // 담당 직원 ID 추가
-  employeeName: string // 담당 직원 이름 추가
+  employeeId: string
+  employeeName: string
 }

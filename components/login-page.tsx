@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Clock } from "lucide-react"
+import { AlertCircle, Clock, Eye, EyeOff } from "lucide-react"
 
 interface LoginPageProps {
   onLogin: (username: string, password: string) => boolean
@@ -19,6 +19,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString())
+  const [showPassword, setShowPassword] = useState(false)
 
   // 현재 시간 업데이트
   useEffect(() => {
@@ -34,6 +35,10 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     if (!success) {
       setError(true)
     }
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -70,13 +75,25 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="password">비밀번호</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2"
+                    onClick={togglePasswordVisibility}
+                    aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
 
               {error && (

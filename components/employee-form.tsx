@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Eye, EyeOff } from "lucide-react"
 import type { Employee } from "@/types/employee"
 import type { Group } from "@/types/group"
 
@@ -19,7 +20,14 @@ interface EmployeeFormProps {
   onCancel: () => void
 }
 
-export default function EmployeeForm({ mode, employeeId, employees, groups, onSubmit, onCancel }: EmployeeFormProps) {
+export default function EmployeeForm({
+  mode,
+  employeeId,
+  employees = [],
+  groups = [], // 기본값 빈 배열 추가
+  onSubmit,
+  onCancel,
+}: EmployeeFormProps) {
   const [id, setId] = useState("")
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
@@ -30,6 +38,7 @@ export default function EmployeeForm({ mode, employeeId, employees, groups, onSu
   const [groupId, setGroupId] = useState("")
   const [groupName, setGroupName] = useState("")
   const [useExistingGroup, setUseExistingGroup] = useState(true)
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (mode === "edit" && employeeId) {
@@ -112,6 +121,10 @@ export default function EmployeeForm({ mode, employeeId, employees, groups, onSu
     onSubmit(employee)
   }
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="space-y-4">
@@ -187,11 +200,12 @@ export default function EmployeeForm({ mode, employeeId, employees, groups, onSu
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">없음</SelectItem>
-                {groups.map((group) => (
-                  <SelectItem key={group.id} value={group.id}>
-                    {group.name}
-                  </SelectItem>
-                ))}
+                {groups &&
+                  groups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           ) : (
@@ -207,7 +221,25 @@ export default function EmployeeForm({ mode, employeeId, employees, groups, onSu
         {mode === "add" && (
           <div className="space-y-2">
             <Label htmlFor="password">초기 비밀번호 *</Label>
-            <Input id="password" type="text" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={togglePasswordVisibility}
+                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
             <p className="text-xs text-gray-500">직원은 로그인 후 비밀번호를 변경할 수 있습니다.</p>
           </div>
         )}
