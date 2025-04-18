@@ -36,8 +36,6 @@ export default function EmployeeForm({
   const [position, setPosition] = useState("")
   const [password, setPassword] = useState("")
   const [groupId, setGroupId] = useState("")
-  const [groupName, setGroupName] = useState("")
-  const [useExistingGroup, setUseExistingGroup] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
@@ -52,8 +50,6 @@ export default function EmployeeForm({
         setPosition(employee.position)
         setPassword(employee.password || "")
         setGroupId(employee.groupId || "")
-        setGroupName(employee.groupName || "")
-        setUseExistingGroup(!!employee.groupId)
       }
     } else {
       // 새 직원 추가 시 ID 생성 (HME + 4자리 숫자)
@@ -85,25 +81,18 @@ export default function EmployeeForm({
       setPosition("")
       setPassword("password") // 기본 비밀번호 설정
       setGroupId("")
-      setGroupName("")
-      setUseExistingGroup(true)
     }
   }, [mode, employeeId, employees])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    let finalGroupId = ""
+    const finalGroupId = groupId
     let finalGroupName = ""
 
-    if (useExistingGroup && groupId) {
+    if (groupId) {
       const selectedGroup = groups.find((g) => g.id === groupId)
-      finalGroupId = groupId
       finalGroupName = selectedGroup?.name || ""
-    } else {
-      // 새 그룹 이름을 입력한 경우
-      finalGroupId = "" // 새 그룹은 아직 ID가 없음
-      finalGroupName = groupName
     }
 
     const employee: Employee = {
@@ -171,51 +160,21 @@ export default function EmployeeForm({
         </div>
 
         <div className="space-y-2">
-          <Label>소속 그룹</Label>
-          <div className="flex space-x-2 mb-2">
-            <Button
-              type="button"
-              variant={useExistingGroup ? "default" : "outline"}
-              size="sm"
-              onClick={() => setUseExistingGroup(true)}
-              className="flex-1"
-            >
-              기존 그룹
-            </Button>
-            <Button
-              type="button"
-              variant={!useExistingGroup ? "default" : "outline"}
-              size="sm"
-              onClick={() => setUseExistingGroup(false)}
-              className="flex-1"
-            >
-              새 그룹
-            </Button>
-          </div>
-
-          {useExistingGroup ? (
-            <Select value={groupId} onValueChange={setGroupId}>
-              <SelectTrigger id="group">
-                <SelectValue placeholder="그룹 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">없음</SelectItem>
-                {groups &&
-                  groups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>
-                      {group.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <Input
-              id="groupName"
-              placeholder="새 그룹 이름 입력"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-            />
-          )}
+          <Label htmlFor="group">소속 지점 *</Label>
+          <Select value={groupId} onValueChange={setGroupId}>
+            <SelectTrigger id="group">
+              <SelectValue placeholder="지점 선택" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">없음</SelectItem>
+              {groups &&
+                groups.map((group) => (
+                  <SelectItem key={group.id} value={group.id}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {mode === "add" && (

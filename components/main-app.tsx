@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserCircle, MapPin, Users, BarChart3, LogOut } from "lucide-react"
+import { UserCircle, MapPin, Users, BarChart3, LogOut, Building2 } from "lucide-react"
 import LoginPage from "./login-page"
 import NewVisit from "./new-visit"
 import EmployeeList from "./employee-list"
@@ -12,6 +12,12 @@ import EmployeeForm from "./employee-form"
 import SimpleModal from "./simple-modal"
 import PasswordChangeForm from "./password-change-form"
 import Performance from "./performance"
+import GroupManagement from "./group-management"
+import VisitDetails from "./visit-details"
+import VisitSchedule from "./visit-schedule"
+import EmployeeVisits from "./employee-visits"
+import EmployeePerformance from "./employee-performance"
+import ExcelExport from "./excel-export"
 import type { Employee, Group, Visit } from "../types"
 
 export default function MainApp() {
@@ -38,6 +44,12 @@ export default function MainApp() {
 
   // 현재 활성화된 탭
   const [activeTab, setActiveTab] = useState("new-visit")
+  const [adminSubTab, setAdminSubTab] = useState("employees")
+
+  // 방문 상세 정보 모달
+  const [showVisitDetails, setShowVisitDetails] = useState(false)
+  const [selectedVisitType, setSelectedVisitType] = useState<"all" | "completed" | "amount">("all")
+  const [selectedVisitData, setSelectedVisitData] = useState<Visit[]>([])
 
   useEffect(() => {
     // 로컬 스토리지에서 데이터 불러오기
@@ -58,8 +70,8 @@ export default function MainApp() {
               region: "서울",
               position: "과장",
               password: "password",
-              groupId: "A",
-              groupName: "영업 1팀",
+              groupId: "G1",
+              groupName: "서울지점",
             },
             {
               id: "HME0002",
@@ -69,8 +81,8 @@ export default function MainApp() {
               region: "부산",
               position: "대리",
               password: "password",
-              groupId: "B",
-              groupName: "영업 2팀",
+              groupId: "G2",
+              groupName: "경남지점",
             },
             {
               id: "admin",
@@ -80,8 +92,8 @@ export default function MainApp() {
               region: "전국",
               position: "이사",
               password: "admin123",
-              groupId: "C",
-              groupName: "관리팀",
+              groupId: "G5",
+              groupName: "호남지점",
             },
             {
               id: "user",
@@ -91,8 +103,8 @@ export default function MainApp() {
               region: "서울",
               position: "사원",
               password: "password",
-              groupId: "A",
-              groupName: "영업 1팀",
+              groupId: "G1",
+              groupName: "서울지점",
             },
           ]
           setEmployees(initialEmployees)
@@ -106,9 +118,11 @@ export default function MainApp() {
         } else {
           // 더미 그룹 데이터 (초기 데이터가 없을 경우에만)
           const initialGroups: Group[] = [
-            { id: "A", name: "영업 1팀" },
-            { id: "B", name: "영업 2팀" },
-            { id: "C", name: "관리팀" },
+            { id: "G1", name: "서울지점" },
+            { id: "G2", name: "경남지점" },
+            { id: "G3", name: "인천지점" },
+            { id: "G4", name: "용인지점" },
+            { id: "G5", name: "호남지점" },
           ]
           setGroups(initialGroups)
           localStorage.setItem("groups", JSON.stringify(initialGroups))
@@ -196,8 +210,8 @@ export default function MainApp() {
           region: "서울",
           position: "과장",
           password: "password",
-          groupId: "A",
-          groupName: "영업 1팀",
+          groupId: "G1",
+          groupName: "서울지점",
         },
         {
           id: "HME0002",
@@ -207,8 +221,8 @@ export default function MainApp() {
           region: "부산",
           position: "대리",
           password: "password",
-          groupId: "B",
-          groupName: "영업 2팀",
+          groupId: "G2",
+          groupName: "경남지점",
         },
         {
           id: "admin",
@@ -218,8 +232,8 @@ export default function MainApp() {
           region: "전국",
           position: "이사",
           password: "admin123",
-          groupId: "C",
-          groupName: "관리팀",
+          groupId: "G5",
+          groupName: "호남지점",
         },
         {
           id: "user",
@@ -229,17 +243,19 @@ export default function MainApp() {
           region: "서울",
           position: "사원",
           password: "password",
-          groupId: "A",
-          groupName: "영업 1팀",
+          groupId: "G1",
+          groupName: "서울지점",
         },
       ]
       setEmployees(initialEmployees)
 
       // 더미 그룹 데이터
       const initialGroups: Group[] = [
-        { id: "A", name: "영업 1팀" },
-        { id: "B", name: "영업 2팀" },
-        { id: "C", name: "관리팀" },
+        { id: "G1", name: "서울지점" },
+        { id: "G2", name: "경남지점" },
+        { id: "G3", name: "인천지점" },
+        { id: "G4", name: "용인지점" },
+        { id: "G5", name: "호남지점" },
       ]
       setGroups(initialGroups)
 
@@ -379,12 +395,82 @@ export default function MainApp() {
     localStorage.setItem("visits", JSON.stringify(newVisits))
   }
 
+  // 방문 기록 수정
+  const handleUpdateVisit = (updatedVisit: Visit) => {
+    const updatedVisits = visits.map((visit) => (visit.id === updatedVisit.id ? updatedVisit : visit))
+    setVisits(updatedVisits)
+    localStorage.setItem("visits", JSON.stringify(updatedVisits))
+  }
+
+  // 방문 기록 삭제
+  const handleDeleteVisit = (visitId: string) => {
+    const updatedVisits = visits.filter((visit) => visit.id !== visitId)
+    setVisits(updatedVisits)
+    localStorage.setItem("visits", JSON.stringify(updatedVisits))
+  }
+
   // 비밀번호 변경
   const handlePasswordChange = (userId: string, newPassword: string) => {
     const updatedEmployees = employees.map((emp) => (emp.id === userId ? { ...emp, password: newPassword } : emp))
     setEmployees(updatedEmployees)
     localStorage.setItem("employees", JSON.stringify(updatedEmployees))
     setShowPasswordForm(false)
+  }
+
+  // 그룹 추가
+  const handleAddGroup = (group: Group) => {
+    const newGroups = [...groups, group]
+    setGroups(newGroups)
+    localStorage.setItem("groups", JSON.stringify(newGroups))
+  }
+
+  // 그룹 수정
+  const handleEditGroup = (updatedGroup: Group) => {
+    const updatedGroups = groups.map((group) => (group.id === updatedGroup.id ? updatedGroup : group))
+    setGroups(updatedGroups)
+    localStorage.setItem("groups", JSON.stringify(updatedGroups))
+
+    // 해당 그룹에 속한 직원들의 그룹명도 업데이트
+    const updatedEmployees = employees.map((employee) =>
+      employee.groupId === updatedGroup.id ? { ...employee, groupName: updatedGroup.name } : employee,
+    )
+    setEmployees(updatedEmployees)
+    localStorage.setItem("employees", JSON.stringify(updatedEmployees))
+  }
+
+  // 그룹 삭제
+  const handleDeleteGroup = (groupId: string) => {
+    // 그룹 삭제
+    const updatedGroups = groups.filter((group) => group.id !== groupId)
+    setGroups(updatedGroups)
+    localStorage.setItem("groups", JSON.stringify(updatedGroups))
+
+    // 해당 그룹에 속한 직원들의 그룹 정보 제거
+    const updatedEmployees = employees.map((employee) =>
+      employee.groupId === groupId ? { ...employee, groupId: "", groupName: "" } : employee,
+    )
+    setEmployees(updatedEmployees)
+    localStorage.setItem("employees", JSON.stringify(updatedEmployees))
+  }
+
+  // 방문 상세 정보 표시
+  const handleShowVisitDetails = (type: "all" | "completed" | "amount") => {
+    let filteredVisits: Visit[] = []
+
+    // 현재 사용자의 방문 기록만 필터링 (관리자가 아닌 경우)
+    const userVisits = currentUser?.isAdmin ? visits : visits.filter((visit) => visit.employeeId === currentUser?.id)
+
+    if (type === "all") {
+      filteredVisits = userVisits
+    } else if (type === "completed") {
+      filteredVisits = userVisits.filter((visit) => visit.contractStatus === "completed")
+    } else if (type === "amount") {
+      filteredVisits = userVisits.filter((visit) => visit.contractStatus === "completed" && visit.contractAmount)
+    }
+
+    setSelectedVisitType(type)
+    setSelectedVisitData(filteredVisits)
+    setShowVisitDetails(true)
   }
 
   // 로그인되지 않은 경우 로그인 페이지 표시
@@ -424,7 +510,7 @@ export default function MainApp() {
           {currentUser?.isAdmin && (
             <TabsTrigger value="admin" className="flex items-center">
               <Users className="h-4 w-4 mr-2" />
-              직원 관리
+              관리자 메뉴
             </TabsTrigger>
           )}
         </TabsList>
@@ -440,21 +526,100 @@ export default function MainApp() {
         <TabsContent value="performance">
           <Card>
             <CardContent className="pt-6">
-              <Performance visits={visits} employees={employees} groups={groups} />
+              <Performance
+                visits={visits}
+                employees={employees}
+                groups={groups}
+                currentUser={currentUser!}
+                onShowDetails={handleShowVisitDetails}
+              />
             </CardContent>
           </Card>
+
+          <div className="mt-6">
+            <VisitSchedule
+              visits={visits.filter((visit) => visit.employeeId === currentUser?.id)}
+              onUpdateVisit={handleUpdateVisit}
+              onDeleteVisit={handleDeleteVisit}
+            />
+          </div>
         </TabsContent>
 
         {currentUser?.isAdmin && (
           <TabsContent value="admin">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="mb-4">
-                  <Button onClick={handleAddEmployee}>직원 추가</Button>
-                </div>
-                <EmployeeList employees={employees} onEdit={handleEditEmployee} onDelete={handleDeleteEmployee} />
-              </CardContent>
-            </Card>
+            <Tabs value={adminSubTab} onValueChange={setAdminSubTab} className="w-full">
+              <TabsList className="mb-6">
+                <TabsTrigger value="employees" className="flex items-center">
+                  <Users className="h-4 w-4 mr-2" />
+                  직원 관리
+                </TabsTrigger>
+                <TabsTrigger value="groups" className="flex items-center">
+                  <Building2 className="h-4 w-4 mr-2" />
+                  지점 관리
+                </TabsTrigger>
+                <TabsTrigger value="employee-visits" className="flex items-center">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  직원별 방문 기록
+                </TabsTrigger>
+                <TabsTrigger value="employee-performance" className="flex items-center">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  직원별 실적 분석
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="employees">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="mb-4">
+                      <Button onClick={handleAddEmployee}>직원 추가</Button>
+                    </div>
+                    <EmployeeList employees={employees} onEdit={handleEditEmployee} onDelete={handleDeleteEmployee} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="groups">
+                <Card>
+                  <CardContent className="pt-6">
+                    <GroupManagement
+                      groups={groups}
+                      onAddGroup={handleAddGroup}
+                      onEditGroup={handleEditGroup}
+                      onDeleteGroup={handleDeleteGroup}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="employee-visits">
+                <Card>
+                  <CardContent className="pt-6">
+                    <EmployeeVisits
+                      visits={visits}
+                      employees={employees}
+                      onUpdateVisit={handleUpdateVisit}
+                      onDeleteVisit={handleDeleteVisit}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="employee-performance">
+                <Card>
+                  <CardContent className="pt-6">
+                    <EmployeePerformance
+                      visits={visits}
+                      employees={employees}
+                      groups={groups}
+                      onUpdateVisit={handleUpdateVisit}
+                    />
+                    <div className="mt-6">
+                      <ExcelExport visits={visits} employees={employees} groups={groups} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         )}
       </Tabs>
@@ -484,6 +649,22 @@ export default function MainApp() {
             onPasswordChange={handlePasswordChange}
             onCancel={() => setShowPasswordForm(false)}
           />
+        </SimpleModal>
+      )}
+
+      {showVisitDetails && (
+        <SimpleModal
+          isOpen={showVisitDetails}
+          onClose={() => setShowVisitDetails(false)}
+          title={
+            selectedVisitType === "all"
+              ? "전체 방문 기록"
+              : selectedVisitType === "completed"
+                ? "계약 완료 방문 기록"
+                : "계약 금액 상세"
+          }
+        >
+          <VisitDetails visits={selectedVisitData} onClose={() => setShowVisitDetails(false)} />
         </SimpleModal>
       )}
     </div>
