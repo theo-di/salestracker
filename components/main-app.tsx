@@ -329,13 +329,8 @@ export default function MainApp() {
 
   // 로그인 처리
   const handleLogin = (username: string, password: string) => {
-    // 아이디를 소문자로 변환하여 대소문자 구분 없이 처리
-    const lowercaseUsername = username.toLowerCase()
-
     const employee = employees.find(
-      (emp) =>
-        (emp.id.toLowerCase() === lowercaseUsername || (emp.email && emp.email.toLowerCase() === lowercaseUsername)) &&
-        emp.password === password,
+      (emp) => (emp.id === username || emp.email === username) && emp.password === password,
     )
 
     if (employee) {
@@ -490,7 +485,7 @@ export default function MainApp() {
         <h1 className="text-2xl font-bold">세일즈트래커</h1>
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
-            <UserCircle className="h-5 w-5 mr-2 text-emerald-600" />
+            <UserCircle className="h-5 w-5 mr-2 text-gray-600" />
             <span className="font-medium">{currentUser?.username}</span>
             <Button variant="ghost" size="sm" onClick={() => setShowPasswordForm(true)}>
               비밀번호 변경
@@ -504,8 +499,11 @@ export default function MainApp() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
-          <TabsTrigger value="dashboard" className="flex items-center">
+        <TabsList className="grid grid-cols-4 mb-8 bg-gray-100">
+          <TabsTrigger
+            value="dashboard"
+            className="flex items-center data-[state=active]:bg-gray-600 data-[state=active]:text-white"
+          >
             <LayoutDashboard className="h-4 w-4 mr-2" />
             대시보드
           </TabsTrigger>
@@ -585,7 +583,9 @@ export default function MainApp() {
                 <Card>
                   <CardContent className="pt-6">
                     <div className="mb-4">
-                      <Button onClick={handleAddEmployee}>직원 추가</Button>
+                      <Button onClick={handleAddEmployee} className="bg-gray-600 hover:bg-gray-700">
+                        직원 추가
+                      </Button>
                     </div>
                     <EmployeeList employees={employees} onEdit={handleEditEmployee} onDelete={handleDeleteEmployee} />
                   </CardContent>

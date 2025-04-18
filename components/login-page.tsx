@@ -49,11 +49,22 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
           <div className="text-center mb-6">
             <div className="flex items-center justify-center mb-2">
-              <Clock className="h-5 w-5 mr-2 text-emerald-600" />
+              <Clock className="h-5 w-5 mr-2 text-gray-600" />
               <span className="text-lg font-medium">{currentTime}</span>
             </div>
             <p className="text-sm text-gray-500">로그인하여 출근 체크를 완료하세요</p>
           </div>
+
+          <Alert className="mb-6 bg-gray-50 text-gray-800 border-gray-200">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <strong>데모 계정 정보:</strong>
+              <br />
+              일반 사용자: ID: user / PW: password
+              <br />
+              관리자: ID: admin / PW: admin123
+            </AlertDescription>
+          </Alert>
 
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
@@ -92,7 +103,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
                 </Alert>
               )}
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-gray-600 hover:bg-gray-700">
                 로그인 및 출근체크
               </Button>
             </div>

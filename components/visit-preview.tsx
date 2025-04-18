@@ -29,10 +29,10 @@ export default function VisitPreview({ data }: VisitPreviewProps) {
 
   if (data.contractStatus === "pending") {
     contractStatusText = "계약 진행 중"
-    contractStatusColor = "text-blue-500"
+    contractStatusColor = "text-gray-500"
   } else if (data.contractStatus === "completed") {
     contractStatusText = "계약 완료"
-    contractStatusColor = "text-green-500"
+    contractStatusColor = "text-gray-700"
   }
 
   // 방문 시간 포맷팅

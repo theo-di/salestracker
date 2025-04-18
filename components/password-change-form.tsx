@@ -67,9 +67,9 @@ export default function PasswordChangeForm({
     <form onSubmit={handleSubmit}>
       <div className="space-y-4">
         {success && (
-          <Alert className="bg-green-50 border-green-200">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-700">비밀번호가 성공적으로 변경되었습니다.</AlertDescription>
+          <Alert className="bg-gray-50 border-gray-200">
+            <CheckCircle className="h-4 w-4 text-gray-600" />
+            <AlertDescription className="text-gray-700">비밀번호가 성공적으로 변경되었습니다.</AlertDescription>
           </Alert>
         )}
 
@@ -153,7 +153,9 @@ export default function PasswordChangeForm({
           <Button type="button" variant="outline" onClick={onCancel}>
             취소
           </Button>
-          <Button type="submit">비밀번호 변경</Button>
+          <Button type="submit" className="bg-gray-600 hover:bg-gray-700">
+            비밀번호 변경
+          </Button>
         </div>
       </div>
     </form>

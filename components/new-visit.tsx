@@ -587,7 +587,7 @@ export default function NewVisit({ onAddVisit, employees, currentUser }: NewVisi
                       </>
                     ) : locationUpdateSuccess ? (
                       <>
-                        <Check className="h-4 w-4 mr-2 text-green-500" />
+                        <Check className="h-4 w-4 mr-2 text-gray-500" />
                         위치 업데이트 완료
                       </>
                     ) : (
@@ -617,12 +617,12 @@ export default function NewVisit({ onAddVisit, employees, currentUser }: NewVisi
               <div className="h-[200px] bg-gray-100 rounded-md flex items-center justify-center mb-4 relative">
                 {isLoadingLocation ? (
                   <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-emerald-500" />
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-gray-500" />
                     <p className="text-gray-500">현재 위치를 가져오는 중입니다...</p>
                   </div>
                 ) : (
                   <div className="text-center">
-                    <MapPin className="h-8 w-8 mx-auto mb-2 text-emerald-500" />
+                    <MapPin className="h-8 w-8 mx-auto mb-2 text-gray-500" />
                     <p className="text-gray-500 mb-1">{location}</p>
                     <p className="text-xs text-gray-400">
                       위도: {latitude.toFixed(6)}, 경도: {longitude.toFixed(6)}
@@ -631,13 +631,13 @@ export default function NewVisit({ onAddVisit, employees, currentUser }: NewVisi
                       <p className="text-xs text-amber-500 mt-2">미리보기 모드: 모의 위치 데이터 사용 중</p>
                     )}
                     {autoUpdateLocation && !isPreviewMode && (
-                      <p className="text-xs text-emerald-500 mt-2">자동 위치 업데이트가 활성화되어 있습니다</p>
+                      <p className="text-xs text-gray-500 mt-2">자동 위치 업데이트가 활성화되어 있습니다</p>
                     )}
                   </div>
                 )}
 
                 {locationUpdateSuccess && !isLoadingLocation && (
-                  <div className="absolute top-2 right-2 bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs flex items-center">
+                  <div className="absolute top-2 right-2 bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs flex items-center">
                     <Check className="h-3 w-3 mr-1" />
                     위치 업데이트됨
                   </div>
@@ -668,7 +668,11 @@ export default function NewVisit({ onAddVisit, employees, currentUser }: NewVisi
                 미리보기
               </Button>
 
-              <Button type="submit" disabled={!formValid || isLoadingLocation}>
+              <Button
+                type="submit"
+                disabled={!formValid || isLoadingLocation}
+                className="bg-gray-600 hover:bg-gray-700"
+              >
                 방문 기록 저장
               </Button>
             </div>
