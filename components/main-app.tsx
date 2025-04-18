@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { UserCircle, MapPin, Users, BarChart3, LogOut, Building2 } from "lucide-react"
+import { UserCircle, MapPin, Users, BarChart3, LogOut, Building2, LayoutDashboard } from "lucide-react"
 import LoginPage from "./login-page"
 import NewVisit from "./new-visit"
 import EmployeeList from "./employee-list"
@@ -18,6 +18,7 @@ import VisitSchedule from "./visit-schedule"
 import EmployeeVisits from "./employee-visits"
 import EmployeePerformance from "./employee-performance"
 import ExcelExport from "./excel-export"
+import Dashboard from "./dashboard/dashboard"
 import type { Employee, Group, Visit } from "../types"
 
 export default function MainApp() {
@@ -43,7 +44,7 @@ export default function MainApp() {
   const [showPasswordForm, setShowPasswordForm] = useState(false)
 
   // 현재 활성화된 탭
-  const [activeTab, setActiveTab] = useState("new-visit")
+  const [activeTab, setActiveTab] = useState("dashboard")
   const [adminSubTab, setAdminSubTab] = useState("employees")
 
   // 방문 상세 정보 모달
@@ -328,8 +329,13 @@ export default function MainApp() {
 
   // 로그인 처리
   const handleLogin = (username: string, password: string) => {
+    // 아이디를 소문자로 변환하여 대소문자 구분 없이 처리
+    const lowercaseUsername = username.toLowerCase()
+
     const employee = employees.find(
-      (emp) => (emp.id === username || emp.email === username) && emp.password === password,
+      (emp) =>
+        (emp.id.toLowerCase() === lowercaseUsername || (emp.email && emp.email.toLowerCase() === lowercaseUsername)) &&
+        emp.password === password,
     )
 
     if (employee) {
@@ -498,7 +504,11 @@ export default function MainApp() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-8">
+        <TabsList className="grid grid-cols-4 mb-8">
+          <TabsTrigger value="dashboard" className="flex items-center">
+            <LayoutDashboard className="h-4 w-4 mr-2" />
+            대시보드
+          </TabsTrigger>
           <TabsTrigger value="new-visit" className="flex items-center">
             <MapPin className="h-4 w-4 mr-2" />
             신규 방문 등록
@@ -514,6 +524,10 @@ export default function MainApp() {
             </TabsTrigger>
           )}
         </TabsList>
+
+        <TabsContent value="dashboard">
+          <Dashboard visits={visits} employees={employees} groups={groups} currentUser={currentUser!} />
+        </TabsContent>
 
         <TabsContent value="new-visit">
           <Card>

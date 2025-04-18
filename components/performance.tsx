@@ -2,13 +2,11 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import type { Visit, Employee, Group } from "../types"
 import { Search } from "lucide-react"
+import type { Visit, Employee, Group } from "../types"
 
 interface PerformanceProps {
   visits: Visit[]
@@ -95,45 +93,6 @@ export default function Performance({ visits, employees, groups, currentUser, on
   const totalContractAmount = filteredVisits
     .filter((visit) => visit.contractStatus === "completed" && visit.contractAmount)
     .reduce((sum, visit) => sum + (visit.contractAmount || 0), 0)
-
-  // 직원별 방문 수
-  const visitsByEmployee = employees
-    .map((employee) => {
-      const employeeVisits = filteredVisits.filter((visit) => visit.employeeId === employee.id)
-      return {
-        name: employee.name,
-        visits: employeeVisits.length,
-        completed: employeeVisits.filter((visit) => visit.contractStatus === "completed").length,
-        amount: employeeVisits
-          .filter((visit) => visit.contractStatus === "completed" && visit.contractAmount)
-          .reduce((sum, visit) => sum + (visit.contractAmount || 0), 0),
-      }
-    })
-    .sort((a, b) => b.visits - a.visits)
-
-  // 그룹별 방문 수
-  const visitsByGroup = groups
-    .map((group) => {
-      const groupEmployees = employees.filter((emp) => emp.groupId === group.id)
-      const groupVisits = filteredVisits.filter((visit) => groupEmployees.some((emp) => emp.id === visit.employeeId))
-
-      return {
-        name: group.name,
-        visits: groupVisits.length,
-        completed: groupVisits.filter((visit) => visit.contractStatus === "completed").length,
-        amount: groupVisits
-          .filter((visit) => visit.contractStatus === "completed" && visit.contractAmount)
-          .reduce((sum, visit) => sum + (visit.contractAmount || 0), 0),
-      }
-    })
-    .sort((a, b) => b.visits - a.visits)
-
-  // 차트 데이터
-  const statusChartData = [
-    { name: "계약 없음", value: visitsByStatus.none },
-    { name: "계약 진행 중", value: visitsByStatus.pending },
-    { name: "계약 완료", value: visitsByStatus.completed },
-  ]
 
   return (
     <div>
@@ -242,84 +201,6 @@ export default function Performance({ visits, employees, groups, currentUser, on
           </Select>
         </div>
       </div>
-
-      <Tabs defaultValue="overall" className="w-full">
-        <TabsList>
-          <TabsTrigger value="overall">전체 현황</TabsTrigger>
-          {currentUser.isAdmin && <TabsTrigger value="employee">직원별 현황</TabsTrigger>}
-          <TabsTrigger value="group">지점별 현황</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overall">
-          <Card>
-            <CardHeader>
-              <CardTitle>계약 상태별 방문 현황</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={statusChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="value" fill="#10b981" name="방문 수" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {currentUser.isAdmin && (
-          <TabsContent value="employee">
-            <Card>
-              <CardHeader>
-                <CardTitle>직원별 방문 현황</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={visitsByEmployee}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="visits" fill="#10b981" name="총 방문 수" />
-                      <Bar dataKey="completed" fill="#0ea5e9" name="계약 완료 수" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
-
-        <TabsContent value="group">
-          <Card>
-            <CardHeader>
-              <CardTitle>지점별 방문 현황</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={visitsByGroup}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="visits" fill="#10b981" name="총 방문 수" />
-                    <Bar dataKey="completed" fill="#0ea5e9" name="계약 완료 수" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   )
 }

@@ -55,17 +55,6 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             <p className="text-sm text-gray-500">로그인하여 출근 체크를 완료하세요</p>
           </div>
 
-          <Alert className="mb-6 bg-blue-50 text-blue-800 border-blue-200">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              <strong>데모 계정 정보:</strong>
-              <br />
-              일반 사용자: ID: user / PW: password
-              <br />
-              관리자: ID: admin / PW: admin123
-            </AlertDescription>
-          </Alert>
-
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="space-y-2">
